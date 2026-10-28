@@ -23,6 +23,9 @@ def test_parse_time_regular_time():
 def test_parse_measurement_regular_line():
     assert parse_measurement("Köln;14:21;21.7") == ("Köln", 861, 21.7)
    # assert parse_measurement("Düsseldorf; 14:21 ; 21.7; 9 ") == ("Düsseldorf", 861, 21.7)
+    with pytest.raises(ValueError):
+        parse_measurement("Düsseldorf; 14:21 21.7 9 ")
+
 
 def test_parse_measurement_invalid_line():
     with pytest.raises(ValueError):       
@@ -31,7 +34,6 @@ def test_parse_measurement_invalid_line():
         parse_measurement(3)
     with pytest.raises(ValueError):       
         parse_measurement("14:21 ; Düsseldorf, 21.7")
-
 
 
 
@@ -54,6 +56,15 @@ def test_filter_by_temperature_regular_values():
 #     ]
 #     with pytest.raises(ValueError):
 #         filter_by_temperature(measurements, 30.0, 1.0)
+
+
+def test_filter_by_temperature_same_lower_upper():
+    measurements = [
+        ("Köln", 600, 10.0),
+        ("Düsseldorf", 720, 18.5),
+        ("Bonn", 900, 25.0)]
+
+    assert filter_by_temperature(measurements, 18.5, 18.5) == [("Düsseldorf", 720, 18.5)]
 
 
 def test_filter_by_temperature_wrong_order():
@@ -88,8 +99,7 @@ def test_hottest_measurement_with_unique_maximum():
     measurements = [
         ("Köln", 600, 10.0),
         ("Düsseldorf", 720, 25.0),
-        ("Bonn", 900, 20.0),
-    ]
+        ("Bonn", 900, 20.0),]
 
     assert hottest_measurement(measurements) == ("Düsseldorf", 720, 25.0)
 
@@ -98,4 +108,3 @@ def test_hottest_measurement_with_zero_measurements():
 
     with pytest.raises(ValueError):
         hottest_measurement(measurements)
-
