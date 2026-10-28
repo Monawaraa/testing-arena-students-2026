@@ -17,7 +17,8 @@ from weather import (
 
 def test_parse_time_regular_time():
     assert parse_time("14:21") == 861
-
+    with pytest.raises(ValueError):
+        parse_time("14:61")
 
 def test_parse_measurement_regular_line():
     assert parse_measurement("Köln;14:21;21.7") == ("Köln", 861, 21.7)
@@ -26,6 +27,12 @@ def test_parse_measurement_regular_line():
 def test_parse_measurement_invalid_line():
     with pytest.raises(ValueError):       
         parse_measurement("Düsseldorf; 14:21 ; 21.7; 9 ")
+    with pytest.raises(ValueError):       
+        parse_measurement(3)
+    with pytest.raises(ValueError):       
+        parse_measurement("14:21 ; Düsseldorf, 21.7")
+
+
 
 
 
@@ -46,7 +53,17 @@ def test_filter_by_temperature_regular_values():
 #         ("Bonn", 900, 25.0),
 #     ]
 #     with pytest.raises(ValueError):
-#         filter_by_temperature(measurements, 500.0, 1000.0)
+#         filter_by_temperature(measurements, 30.0, 1.0)
+
+
+def test_filter_by_temperature_wrong_order():
+    measurements = [
+        ("Köln", 600, 10.0),
+        ("Düsseldorf", 720, 18.5),
+        ("Bonn", 900, 25.0),
+    ]
+    with pytest.raises(ValueError):
+        filter_by_temperature(measurements, 30.0, 1.0)
 
 
 def test_average_temperature_regular_values():
@@ -81,4 +98,4 @@ def test_hottest_measurement_with_zero_measurements():
 
     with pytest.raises(ValueError):
         hottest_measurement(measurements)
-        
+
